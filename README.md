@@ -148,23 +148,34 @@ non-repudiation).
 
 | # | Module | File(s) | Status | Notes |
 |---|---|---|---|---|
-| M0 | Pauli algebra + Pauli-frame correction + eigenstate helpers | `qtrinetra/core/pauli.py` | TODO | `pauli_frame_correct`, `FLIP`, `measure_eigenstate_in_basis` |
-| M0 | Wegman–Carter MAC (polynomial universal hashing over GF(2^64)) | `qtrinetra/core/mac.py` | TODO | one-time-key, info-theoretic |
-| M1 | Entanglement & teleportation engine | `qtrinetra/engine/teleport.py` | TODO | Stim circuit (Bell pair + Bell measurement + verifier measurement in chosen basis) and a fast exact classical "stabilizer-table" path; CHSH sampler |
-| M2 | QDS protocol core (KeyGen/Distribute/Sign/Verify/Transfer/Symmetrize) | `qtrinetra/protocol/qds.py` | TODO | dataclasses: `PrivateKey`, `Signature`, `VerifierRecord`, `Verdict` |
-| M3 | Detectors D1–D5 | `qtrinetra/detect/d1_mismatch.py` … `d5_replay.py` | TODO | each returns `DetectorResult(p_value, stats, flag)` |
-| M3 | SPRT, Fisher fusion, decision table | `qtrinetra/detect/sprt.py`, `fusion.py` | TODO | `ThreatReport` with class, QTI, confidence |
-| M4 | Attack digital twin | `qtrinetra/attacks/adversaries.py`, `noise.py` | TODO | 9 adversaries + benign noise |
-| M5 | Q-Ledger | `qtrinetra/ledger/qledger.py` | TODO | SHA3-256 chain + Merkle root, SQLite |
-| M6 | Analytics / benchmarks | `qtrinetra/analytics/evaluate.py`, `python -m qtrinetra.cli bench` | TODO | forgery-prob vs L, SPRT qubit savings, FAR/FRR, confusion matrix |
-| API | FastAPI orchestrator (REST + WebSocket) | `backend/app.py` | TODO | `/api/run`, `/api/demo`, `/api/ledger`, `/ws/live` |
-| UI | Dashboard (Pauli radar, QTI gauge, SPRT curve, CHSH meter, ledger explorer) | `frontend/index.html` (+ Plotly CDN) | TODO | single-page, no build step |
-| QA | Tests (pytest + Hypothesis), No-ML CI gate | `tests/`, `.github/workflows/ci.yml`, `scripts/no_ml_gate.py` | TODO | property test: honest signature always accepted at zero noise |
-| Ops | Docker / compose | `Dockerfile`, `docker-compose.yml` | TODO | |
-| Docs | Math model | `docs/MATH_MODEL.md` | TODO | Hoeffding/SPRT bounds, Pauli inversion derivation |
+| M0 | Pauli algebra + Pauli-frame correction + eigenstate helpers | `qtrinetra/core/pauli.py` | DONE | `pauli_frame_correct`, `FLIP`, `measure_eigenstate_in_basis` |
+| M0 | Wegman–Carter MAC (polynomial universal hashing over GF(2^64)) | `qtrinetra/core/mac.py` | DONE | one-time-key, info-theoretic |
+| M1 | Entanglement & teleportation engine | `qtrinetra/engine/teleport.py` | DONE | Stim circuit (Bell pair + Bell measurement + verifier measurement in chosen basis) and a fast exact classical "stabilizer-table" path; CHSH sampler |
+| M2 | QDS protocol core (KeyGen/Distribute/Sign/Verify/Transfer/Symmetrize) | `qtrinetra/protocol/qds.py` | DONE | dataclasses: `PrivateKey`, `Signature`, `VerifierRecord`, `Verdict` |
+| M3 | Detectors D1–D5 | `qtrinetra/detect/d1_mismatch.py` … `d5_replay.py` | DONE | each returns `DetectorResult(p_value, stats, flag)` |
+| M3 | SPRT, Fisher fusion, decision table | `qtrinetra/detect/sprt.py`, `fusion.py` | DONE | `ThreatReport` with class, QTI, confidence |
+| M4 | Attack digital twin | `qtrinetra/attacks/adversaries.py`, `noise.py` | DONE | 9 adversaries + benign noise |
+| M5 | Q-Ledger | `qtrinetra/ledger/qledger.py` | DONE | SHA3-256 chain + Merkle root, SQLite |
+| M6 | Analytics / benchmarks | `qtrinetra/analytics/evaluate.py`, `python -m qtrinetra.cli bench` | DONE | forgery-prob vs L, SPRT qubit savings, FAR/FRR, confusion matrix |
+| API | FastAPI orchestrator (REST + WebSocket) | `backend/app.py` | DONE | `/api/run`, `/api/demo`, `/api/ledger`, `/ws/live` |
+| UI | Dashboard (Pauli radar, QTI gauge, SPRT curve, CHSH meter, ledger explorer) | `frontend/index.html` (+ Plotly CDN) | DONE | single-page, no build step |
+| QA | Tests (pytest + Hypothesis), No-ML CI gate | `tests/` (58 tests), `ci/github-workflow-ci.yml`, `scripts/no_ml_gate.py` | DONE | property test: honest signature always accepted at zero noise. Copy workflow to `.github/workflows/` (token lacked permission) |
+| Ops | Docker / compose | `Dockerfile`, `docker-compose.yml` | DONE | |
+| Docs | Math model | `docs/MATH_MODEL.md` | DONE | Hoeffding/SPRT bounds, Pauli inversion derivation |
 
 (Status is updated by the agent as modules land. If a row says `WIP`, check `git log` for the last
 commit touching that file.)
+
+**Current state (2026-10-03): prototype is COMPLETE and running end-to-end.** `pytest -q` → 58 passed.
+All 17 digital-twin scenarios are classified correctly (see `tests/test_detect.py::EXPECTED`).
+
+### Ideas for the next session (not yet done)
+- Jupyter notebook / PDF security report generated from `qtrinetra.analytics.evaluate.full_report()`.
+- Qiskit circuit diagrams + optional IBM hardware demo for the teleportation step (visual only).
+- three.js Bloch sphere of teleported eigenstates on the dashboard.
+- PostgreSQL backend for Q-Ledger (schema already DB-agnostic) and Hyperledger anchoring.
+- Noise-adaptive thresholds: estimate e0 from calibration runs instead of fixing it.
+- Export confusion matrix / forgery-vs-L charts to the dashboard (`/api/bench/quick` exists).
 
 ---
 

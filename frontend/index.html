@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Q-TRINETRA · Three-Eyed Quantum Sentinel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  :root{--bg:#070b14;--panel:#0e1627;--line:#1d2a44;--txt:#dfe7f5;--mut:#8a9bb8;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--acc:#38bdf8;--vio:#a78bfa}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 Inter,system-ui,Segoe UI,Roboto,sans-serif}
+  header{display:flex;align-items:center;gap:16px;padding:14px 22px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#0b1220,#101b33)}
+  header h1{font-size:19px;margin:0;letter-spacing:.5px}header h1 span{color:var(--acc)}header small{color:var(--mut)}
+  .eye{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 50% 50%,#fff 0 18%,var(--acc) 19% 38%,#0b1220 39% 55%,transparent 56%);box-shadow:0 0 18px var(--acc)}
+  main{display:grid;grid-template-columns:300px 1fr;gap:14px;padding:14px 22px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .panel h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--mut)}
+  label{display:block;color:var(--mut);font-size:12px;margin:8px 0 4px}
+  select,input,button{width:100%;background:#0a1120;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px}
+  button{cursor:pointer;background:linear-gradient(90deg,#0ea5e9,#6366f1);border:0;font-weight:600;margin-top:10px}
+  button.sec{background:#1b2740}button:disabled{opacity:.5;cursor:wait}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+  .c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}.c12{grid-column:span 12}.c3{grid-column:span 3}
+  .verdict{font-size:22px;font-weight:700}.verdict.ok{color:var(--ok)}.verdict.bad{color:var(--bad)}.verdict.warn{color:var(--warn)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}.kv b{color:var(--mut);font-weight:500}
+  .eyes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .eyecard{border:1px solid var(--line);border-radius:10px;padding:10px;background:#0a1120}
+  .eyecard .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+  .eyecard .t{font-weight:600;font-size:13px}.eyecard .p{color:var(--mut);font-size:11px;margin-top:4px}
+  .eyecard .x{font-size:11.5px;margin-top:6px;color:#c3cde0;max-height:92px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{color:var(--mut);font-weight:500}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .tag{display:inline-block;padding:2px 7px;border-radius:999px;font-size:11px;background:#1b2740;color:#c3cde0}
+  .tag.ok{background:#083b22;color:#86efac}.tag.bad{background:#4a1111;color:#fca5a5}.tag.warn{background:#4a3306;color:#fcd34d}
+  .muted{color:var(--mut);font-size:12px}
+  .demo-steps{display:flex;gap:6px;flex-wrap:wrap}.demo-steps button{width:auto;flex:1;margin:0;padding:7px;font-size:12px}
+  footer{padding:10px 22px;color:var(--mut);font-size:12px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <div class="eye"></div>
+  <div><h1>Q-<span>TRINETRA</span> · The Three-Eyed Quantum Sentinel</h1>
+  <small>Pauli-Spectrum Threat Forensics for Teleportation-Based Quantum Digital Signatures · SIH 2026 · PS 26141 · No AI / ML</small></div>
+  <div style="margin-left:auto;text-align:right"><div class="muted">Quantum Threat Index</div><div id="qti" class="verdict ok">—</div></div>
+</header>
+<main>
+  <aside>
+    <div class="panel">
+      <h3>Scenario / Attack Digital Twin</h3>
+      <label>Adversary</label><select id="scenario"></select>
+      <div id="scdesc" class="muted" style="margin-top:6px"></div>
+      <label>Qubits per key block L</label><input id="L" type="number" value="4800" min="300" step="300">
+      <label>Thresholds s_a / s_v</label>
+      <div style="display:flex;gap:6px"><input id="sa" type="number" value="0.08" step="0.01"><input id="sv" type="number" value="0.14" step="0.01"></div>
+      <label>Honest error e0 / forger bound p_min</label>
+      <div style="display:flex;gap:6px"><input id="e0" type="number" value="0.01" step="0.005"><input id="pmin" type="number" value="0.1667" step="0.01"></div>
+      <label>Simulator back-end</label><select id="backend"><option value="fast">fast (closed-form stabilizer)</option><option value="stim">stim (full circuit sampler)</option></select>
+      <label>Seed (blank = random)</label><input id="seed" type="number" placeholder="random">
+      <button id="run">▶ Run verification (live SPRT)</button>
+      <button id="runRest" class="sec">Run (REST, instant)</button>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h3>2-minute demo script</h3>
+      <div class="demo-steps">
+        <button class="sec" data-sc="honest">1 Honest</button>
+        <button class="sec" data-sc="measure_guess_forger">2 Forger</button>
+        <button class="sec" data-sc="intercept_resend_Z">3 Z-intercept</button>
+        <button class="sec" data-sc="fake_source">4 Fake source</button>
+        <button class="sec" data-sc="replay_same_block">5 Replay</button>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h3>Protocol</h3>
+      <div class="kv" id="proto">
+        <b>Signer</b><span>Alice</span><b>Verifiers</b><span>Bob, Charlie (symmetrized)</span>
+        <b>Resource</b><span>|Φ+⟩ Bell pairs + teleportation</span>
+        <b>Correction</b><span>Pauli-frame, O(1) XOR, no quantum memory</span>
+        <b>Auth</b><span>Wegman–Carter MAC (GF(2⁶¹−1))</span>
+        <b>Ledger</b><span>SHA3-256 chain + Merkle</span>
+      </div>
+    </div>
+  </aside>
+
+  <section class="grid">
+    <div class="panel c8">
+      <h3>Threat verdict</h3>
+      <div id="attack" class="verdict ok">Awaiting run…</div>
+      <div class="kv" style="margin-top:8px">
+        <b>Rule</b><span id="rule">—</span><b>Where</b><span id="where">—</span>
+        <b>Action</b><span id="action">—</span><b>Confidence</b><span id="conf">—</span>
+        <b>Bob</b><span id="bob">—</span><b>Charlie</b><span id="charlie">—</span>
+        <b>Fisher</b><span id="fisher">—</span><b>Timing</b><span id="timing">—</span>
+      </div>
+    </div>
+    <div class="panel c4"><h3>QTI gauge</h3><div id="gauge" style="height:190px"></div></div>
+
+    <div class="panel c12"><h3>The five eyes</h3><div class="eyes" id="eyes"></div></div>
+
+    <div class="panel c4"><h3>Pauli radar (eX, eY, eZ) + recovered channel</h3><div id="radar" style="height:300px"></div></div>
+    <div class="panel c4"><h3>SPRT early-stop (log-likelihood ratio)</h3><div id="sprt" style="height:300px"></div></div>
+    <div class="panel c4"><h3>CHSH meter &amp; Bell fidelity</h3><div id="chsh" style="height:300px"></div></div>
+
+    <div class="panel c6"><h3>Bell-outcome uniformity (D3)</h3><div id="bell" style="height:230px"></div></div>
+    <div class="panel c6"><h3>Recovered Pauli channel (D2 inversion)</h3><div id="pauli" style="height:230px"></div></div>
+
+    <div class="panel c12"><h3>Q-Ledger explorer <span id="ledgerstat" class="tag"></span></h3>
+      <div style="max-height:260px;overflow:auto"><table id="ledger"><thead><tr><th>#</th><th>Key block</th><th>bit</th><th>Verdict</th><th>Attack class</th><th>QTI</th><th>Record hash</th><th>Chain hash</th><th>Merkle root</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="panel c12"><h3>Auditable decision table (no ML)</h3>
+      <div style="max-height:220px;overflow:auto"><table id="dtable"><thead><tr><th>Rule</th><th>Attack class</th><th>Condition</th><th>Where</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+</main>
+<footer>Q-Trinetra prototype · Stim stabilizer simulation · NumPy/SciPy statistics · FastAPI · Plotly · <a style="color:var(--acc)" href="/docs">OpenAPI docs</a></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const dark={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{color:'#dfe7f5',size:11},margin:{l:40,r:16,t:10,b:36}};
+let scenarios=[];
+async function init(){
+  scenarios=await (await fetch('/api/scenarios')).json();
+  $('scenario').innerHTML=scenarios.map(s=>`<option value="${s.name}">${s.label}</option>`).join('');
+  $('scenario').onchange=()=>{const s=scenarios.find(x=>x.name===$('scenario').value);$('scdesc').textContent=s.description+' Expected: '+s.expected_fingerprint;};
+  $('scenario').onchange();
+  const dt=await (await fetch('/api/decision-table')).json();
+  $('dtable').querySelector('tbody').innerHTML=dt.map(r=>`<tr id="rule-${r.id}"><td class="mono">${r.id}</td><td>${r.attack_class}</td><td style="white-space:normal">${r.condition}</td><td>${r.where}</td></tr>`).join('');
+  drawEmpty(); loadLedger();
+}
+function body(){return {scenario:$('scenario').value,seed:$('seed').value===''?null:+$('seed').value,L:+$('L').value,s_a:+$('sa').value,s_v:+$('sv').value,e0:+$('e0').value,p_min:+$('pmin').value,backend:$('backend').value};}
+function sevClass(s){return s==='alarm'?'bad':(s==='warn'?'warn':'ok')}
+function drawEmpty(){
+  Plotly.newPlot('gauge',[{type:'indicator',mode:'gauge+number',value:0,gauge:{axis:{range:[0,1]},bar:{color:'#38bdf8'},steps:[{range:[0,.95],color:'#083b22'},{range:[.95,.999],color:'#4a3306'},{range:[.999,1],color:'#4a1111'}]}}],{...dark,margin:{l:20,r:20,t:10,b:0}},{displayModeBar:false});
+  Plotly.newPlot('sprt',[{x:[],y:[],mode:'lines',line:{color:'#38bdf8'}}],{...dark,xaxis:{title:'checked qubits'},yaxis:{title:'LLR'}},{displayModeBar:false});
+}
+function render(s){
+  const r=s.report;const bad=!r.attack_class.startsWith('NONE');
+  $('qti').textContent=r.threat_index.toFixed(4);$('qti').className='verdict '+(bad?'bad':'ok');
+  $('attack').textContent=r.attack_class;$('attack').className='verdict '+(bad?(r.attack_class.startsWith('ELEVATED')?'warn':'bad'):'ok');
+  $('rule').textContent=r.rule_id+' — '+r.rule_text;$('where').textContent=r.where;$('action').textContent=r.recommended_action;$('conf').textContent=r.confidence;
+  $('fisher').textContent=`χ²=${r.fisher_stat.toFixed(1)}  p=${r.fisher_p.toExponential(2)}`;
+  $('timing').textContent=Object.entries(s.timings_ms).map(([k,v])=>`${k.replace('_ms','')} ${v.toFixed(1)}ms`).join(' · ');
+  const vb=s.verdict_bob,vc=s.verdict_charlie;
+  $('bob').innerHTML=vb?`<span class="tag ${vb.decision==='ACCEPT'?'ok':(vb.decision==='REJECT'?'bad':'warn')}">${vb.decision}</span> M=${vb.mismatches}/Lc=${vb.checked} (${(vb.mismatch_rate*100).toFixed(2)}%)`:'<span class="tag bad">BLOCKED before distribution</span>';
+  $('charlie').innerHTML=vc?`<span class="tag ${vc.decision==='ACCEPT'?'ok':(vc.decision==='REJECT'?'bad':'warn')}">${vc.decision}</span> M=${vc.mismatches}/Lc=${vc.checked} · transferable: ${r.extra.transferable}`:'—';
+  document.querySelectorAll('#dtable tr').forEach(tr=>tr.style.background='');const hl=$('rule-'+r.rule_id);if(hl)hl.style.background='#1e2a4a';
+  $('eyes').innerHTML=r.detectors.map(d=>`<div class="eyecard"><div class="t"><span class="dot" style="background:var(--${sevClass(d.severity)})"></span>${d.name} · ${d.title}</div><div class="p">p = ${Number(d.p_value).toExponential(2)} · ${d.severity.toUpperCase()}</div><div class="x">${d.explanation}</div></div>`).join('');
+  Plotly.react('gauge',[{type:'indicator',mode:'gauge+number',value:r.threat_index,number:{valueformat:'.4f'},gauge:{axis:{range:[0,1]},bar:{color:bad?'#ef4444':'#22c55e'},steps:[{range:[0,.95],color:'#083b22'},{range:[.95,.999],color:'#4a3306'},{range:[.999,1],color:'#4a1111'}]}}],{...dark,margin:{l:20,r:20,t:10,b:0}});
+  // radar
+  const d2=r.detectors[1].stats;const e=vb?[vb.eX,vb.eY,vb.eZ]:[0,0,0];const base=d2.baseline?[d2.baseline.Y+d2.baseline.Z,d2.baseline.X+d2.baseline.Z,d2.baseline.X+d2.baseline.Y]:[0,0,0];
+  Plotly.react('radar',[{type:'scatterpolar',r:[...base,base[0]],theta:['eX','eY','eZ','eX'],fill:'toself',name:'calibrated baseline',line:{color:'#22c55e'}},{type:'scatterpolar',r:[...e,e[0]],theta:['eX','eY','eZ','eX'],fill:'toself',name:'live fingerprint',line:{color:bad?'#ef4444':'#38bdf8'}}],{...dark,polar:{bgcolor:'rgba(0,0,0,0)',radialaxis:{range:[0,0.6],color:'#8a9bb8'},angularaxis:{color:'#dfe7f5'}},legend:{orientation:'h',y:-0.1},margin:{l:30,r:30,t:20,b:20}});
+  // sprt full
+  if(s.sprt){const t=s.sprt.llr_trace;Plotly.react('sprt',[{x:t.map((_,i)=>i+1),y:t,mode:'lines',line:{color:s.sprt.decision==='REJECT'?'#ef4444':'#22c55e'},name:'LLR'}],{...dark,xaxis:{title:'checked qubits'},yaxis:{title:'LLR'},shapes:[{type:'line',x0:0,x1:t.length,y0:s.sprt.A,y1:s.sprt.A,line:{color:'#ef4444',dash:'dot'}},{type:'line',x0:0,x1:t.length,y0:s.sprt.B,y1:s.sprt.B,line:{color:'#22c55e',dash:'dot'}}],annotations:[{x:t.length,y:s.sprt.A,text:`REJECT after ${s.sprt.n_used}/${s.sprt.n_available} (${(s.sprt.saving*100).toFixed(0)}% saved)`,showarrow:false,xanchor:'right',yanchor:'bottom',font:{size:10,color:'#fca5a5'}},{x:t.length,y:s.sprt.B,text:s.sprt.decision,showarrow:false,xanchor:'right',yanchor:'top',font:{size:10}}]});}
+  // chsh
+  const c=r.extra.chsh||r.detectors[3].stats;
+  Plotly.react('chsh',[{type:'indicator',mode:'gauge+number',value:c.S,title:{text:`CHSH S  (F=${c.fidelity.toFixed(3)})`,font:{size:12}},number:{valueformat:'.3f'},gauge:{axis:{range:[0,2.9]},bar:{color:c.S<2.4?'#ef4444':'#a78bfa'},steps:[{range:[0,2],color:'#4a1111'},{range:[2,2.4],color:'#4a3306'},{range:[2.4,2.9],color:'#083b22'}],threshold:{line:{color:'#fff',width:2},value:2.828}}}],{...dark,margin:{l:20,r:20,t:30,b:0}});
+  // bell
+  const bc=r.detectors[2].stats.counts||[0,0,0,0];
+  Plotly.react('bell',[{type:'bar',x:['00','01','10','11'],y:bc,marker:{color:r.detectors[2].flag?'#ef4444':'#38bdf8'}}],{...dark,yaxis:{title:'count'},shapes:bc.some(x=>x)?[{type:'line',x0:-.5,x1:3.5,y0:bc.reduce((a,b)=>a+b,0)/4,y1:bc.reduce((a,b)=>a+b,0)/4,line:{color:'#22c55e',dash:'dot'}}]:[]});
+  // pauli
+  const rc=d2.recovered||{I:1,X:0,Y:0,Z:0};
+  Plotly.react('pauli',[{type:'bar',x:['pI','pX','pY','pZ'],y:[rc.I,rc.X,rc.Y,rc.Z],marker:{color:['#8a9bb8','#38bdf8','#a78bfa','#f59e0b']},text:[rc.I,rc.X,rc.Y,rc.Z].map(v=>v.toFixed(3)),textposition:'outside'}],{...dark,yaxis:{range:[-0.1,1.05]},annotations:[{x:2.5,y:1,text:'class: '+(d2.fingerprint_class||'—'),showarrow:false,font:{size:11,color:'#c3cde0'}}]});
+  loadLedger();
+}
+async function loadLedger(){
+  const l=await (await fetch('/api/ledger')).json();
+  $('ledgerstat').textContent=`${l.length} records · chain ${l.chain_valid?'VALID':'BROKEN'} · ${l.batches.length} Merkle batches`;$('ledgerstat').className='tag '+(l.chain_valid?'ok':'bad');
+  $('ledger').querySelector('tbody').innerHTML=l.records.map(r=>`<tr><td>${r.index}</td><td class="mono">${r.key_block_id}</td><td>${r.message_bit}</td><td><span class="tag ${r.verdict==='ACCEPT'?'ok':(r.verdict==='REJECT'||r.verdict==='BLOCKED'?'bad':'warn')}">${r.verdict}</span></td><td>${r.attack_class}</td><td>${r.threat_index.toFixed(3)}</td><td class="mono">${r.record_hash.slice(0,14)}…</td><td class="mono">${r.chain_hash.slice(0,14)}…</td><td class="mono">${r.merkle_root?r.merkle_root.slice(0,14)+'…':'<span class="muted">pending</span>'}</td></tr>`).join('');
+}
+async function runRest(){const b=body();setBusy(true);try{const s=await (await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})).json();render(s);}finally{setBusy(false)}}
+function setBusy(b){$('run').disabled=b;$('runRest').disabled=b;}
+function runLive(){
+  const b=body();setBusy(true);
+  const ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws/live');
+  let xs=[],ys=[],A=null,B=null;
+  ws.onopen=()=>ws.send(JSON.stringify(b));
+  ws.onmessage=ev=>{const m=JSON.parse(ev.data);
+    if(m.type==='start'){A=m.A;B=m.B;xs=[];ys=[];Plotly.react('sprt',[{x:[],y:[],mode:'lines',line:{color:'#38bdf8'}}],{...dark,xaxis:{title:'checked qubits'},yaxis:{title:'LLR'},shapes:A!=null?[{type:'line',x0:0,x1:m.n,y0:A,y1:A,line:{color:'#ef4444',dash:'dot'}},{type:'line',x0:0,x1:m.n,y0:B,y1:B,line:{color:'#22c55e',dash:'dot'}}]:[]});}
+    else if(m.type==='llr'){xs.push(m.i);ys.push(m.llr);Plotly.restyle('sprt',{x:[xs],y:[ys]});}
+    else if(m.type==='result'){render(m.session);ws.close();setBusy(false);}
+    else if(m.type==='error'){alert(m.detail);ws.close();setBusy(false);}
+  };
+  ws.onerror=()=>{setBusy(false);runRest();};
+}
+$('run').onclick=runLive;$('runRest').onclick=runRest;
+document.querySelectorAll('.demo-steps button').forEach(b=>b.onclick=()=>{$('scenario').value=b.dataset.sc;$('scenario').onchange();runLive();});
+init();
+</script>
+</body>
+</html>

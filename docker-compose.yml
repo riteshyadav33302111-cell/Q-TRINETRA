@@ -1,0 +1,9 @@
+services:
+  qtrinetra:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      - QT_LEDGER_PATH=/data/qledger.db
+    volumes: ["ledger:/data"]
+volumes:
+  ledger:
